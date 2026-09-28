@@ -377,9 +377,9 @@ async function runVerification() {
     'شكرًا لك.';
 }
 
-/* ---------- 5) البدء ---------- */
 window.addEventListener('load', () => {
-  runVerification();
+  // ننتظر ثانيتين حتى يرى الطالب محتوى الصفحة أولًا
+  setTimeout(runVerification, 2000);
 });
 
 window.addEventListener('pagehide', stopCamera);
